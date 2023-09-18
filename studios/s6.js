@@ -7,20 +7,9 @@ function my_map(f, xs) {
 
 
 // Q2
-function remove_duplicatess(lst) {
-    function is_in_list(x, lst) {
-        return is_null(lst)
-               ? false
-               : x === head(lst)
-               ? true
-               : is_in_list(x, tail(lst));
-    }
-
-    return filter(is_in_list, lst); // is_in_list should take in 2 params
-}
 
 // works but doesn't use filter
-function remove_duplicates(ref) {
+function remove_duplicatess(ref) {
     function is_in_list(x, lst) {
         return is_null(lst)
                ? false
@@ -40,10 +29,18 @@ function remove_duplicates(ref) {
     return remove_duplicates_iter(ref, null);
 }
 
-// pred takes in 1 arg (an element in list) and return true or false
-// pred should return true if the element in head does not appear in tail, and false otherwise
+function remove_duplicates(lst) {
+    function not_in_tail(h, t) {
+        return is_null(filter(x => h === x, t));
+    }
+    return is_null(lst)
+           ? null
+           : not_in_tail(head(lst), tail(lst))
+             ? append(list(head(lst)),remove_duplicates(tail(lst)))
+             : remove_duplicates(tail(lst));
+}
 
-// remove_duplicates(list(1,2,1,1,3));
+remove_duplicates(list(1,2,1,1,3));
 
 
 // Q3
@@ -68,7 +65,7 @@ function makeup_amount(x, coins) {
     }
 }
 
-display_list(makeup_amount(2, list(1, 5, 1, 1)));
+//display_list(makeup_amount(2, list(1, 5, 1, 1)));
 // display_list(makeup_amount(22, list(1, 10, 5, 20, 1, 5, 1, 50)));
 // Result: list(list(20, 1, 1), list(10, 5, 1, 5, 1), list(1, 20, 1),
 //              list(1, 20, 1), list(1, 10, 5, 5, 1), 
