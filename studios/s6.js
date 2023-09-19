@@ -1,3 +1,82 @@
+// Implementing accumulate
+function accumulate(f, init, lst) {
+    return is_null(lst)
+           ? init
+           : f(head(lst), accumulate(f, init, tail(lst)));
+}
+
+accumulate((x, y) => x + y, 0, list(1,2,3));
+
+// Implementing filter with accumulate
+function filter(f, lst) {
+    return is_null(lst)
+           ? null
+           : f(head(lst))
+           ? pair(head(lst), filter(f, tail(lst)))
+           : filter(f, tail(lst));
+}
+
+filter(x => x > 2, list(1,2,3,4,5));
+
+// Implementing map with accumulate
+
+
+
+
+// function remove_duplicates(lst) {
+//     const f = (x, y) => is_null(member(x, y))
+//               ? pair(x, y)
+//               : y;
+//     return accumulate(f, null, lst);
+// }
+
+
+// remove_duplicates(list(1,2,1,1,3));
+
+// function subsets(xs) {
+//     if (is_null(xs)) {
+//         return list(null);
+//     } else {
+//         const combi_A = subsets(tail(xs));
+//         const combi_B = map(y => append(list(head(xs)), y), 
+//                             combi_A);
+//         return append(combi_A, combi_B);
+//     }
+// }
+
+// subsets(list(1,2,3));
+
+// function permutations(xs) {
+//     if (is_null(xs)) {
+//         return list(null);
+//     } else {
+//         // does not use head
+//         const combi_A = map(x => append(x, list(head(xs))), 
+//                                  permutations(tail(xs)));
+        
+//         // use head
+//         const combi_B = map(x => pair(head(xs), x), 
+//                             permutations(tail(xs)));
+//         return append(combi_A, combi_B);
+//     }
+// }
+
+function permutations(xs) {
+    if (is_null(xs)) {
+        return list(null);
+    } else {
+        return map(x => map(y => pair(x, y), 
+                            permutations(filter(n => n !== x, xs))), 
+                   xs);
+    }
+}
+
+
+permutations(list(1,2,3));
+display_list(permutations(list(1,2,3)));
+
+
+
 // Q1
 function my_map(f, xs) {
     return accumulate((x, y) => pair(f(x), y), null, xs);
@@ -78,29 +157,5 @@ function makeup_amount(x, coins) {
 //              list(1, 10, 5, 1, 5))
 
 
-function accumulate(f, init, lst) {
-    return is_null(lst)
-           ? init
-           : f(head(lst), accumulate(f, init, tail(lst)));
-}
 
-accumulate((x, y) => x + y, 0, list(1,2,3));
 
-// function filter(f, lst) {
-//     function f(x, y) {
-//         return pair(x, y);
-//     }
-//     return is_null(lst)
-//           ? null
-//           : accumulate(f, null, lst);
-// }
-
-function filter(f, lst) {
-    return is_null(lst)
-           ? null
-           : f(head(lst))
-           ? pair(head(lst), filter(f, tail(lst)))
-           : filter(f, tail(lst));
-}
-
-filter(x => x > 2, list(1,2,3,4,5));
