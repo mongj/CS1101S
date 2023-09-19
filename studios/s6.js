@@ -29,15 +29,21 @@ function remove_duplicatess(ref) {
     return remove_duplicates_iter(ref, null);
 }
 
+// function remove_duplicates(lst) {
+//     function not_in_tail(h, t) {
+//         return is_null(filter(x => h === x, t));
+//     }
+//     return is_null(lst)
+//           ? null
+//           : not_in_tail(head(lst), tail(lst))
+//              ? append(list(head(lst)),remove_duplicates(tail(lst)))
+//              : remove_duplicates(tail(lst));
+// }
+
 function remove_duplicates(lst) {
-    function not_in_tail(h, t) {
-        return is_null(filter(x => h === x, t));
-    }
     return is_null(lst)
            ? null
-           : not_in_tail(head(lst), tail(lst))
-             ? append(list(head(lst)),remove_duplicates(tail(lst)))
-             : remove_duplicates(tail(lst));
+           : append(list(head(lst)), remove_duplicates(filter(x => x !== head(lst), lst)));
 }
 
 remove_duplicates(list(1,2,1,1,3));
@@ -70,3 +76,31 @@ function makeup_amount(x, coins) {
 // Result: list(list(20, 1, 1), list(10, 5, 1, 5, 1), list(1, 20, 1),
 //              list(1, 20, 1), list(1, 10, 5, 5, 1), 
 //              list(1, 10, 5, 1, 5))
+
+
+function accumulate(f, init, lst) {
+    return is_null(lst)
+           ? init
+           : f(head(lst), accumulate(f, init, tail(lst)));
+}
+
+accumulate((x, y) => x + y, 0, list(1,2,3));
+
+// function filter(f, lst) {
+//     function f(x, y) {
+//         return pair(x, y);
+//     }
+//     return is_null(lst)
+//           ? null
+//           : accumulate(f, null, lst);
+// }
+
+function filter(f, lst) {
+    return is_null(lst)
+           ? null
+           : f(head(lst))
+           ? pair(head(lst), filter(f, tail(lst)))
+           : filter(f, tail(lst));
+}
+
+filter(x => x > 2, list(1,2,3,4,5));
