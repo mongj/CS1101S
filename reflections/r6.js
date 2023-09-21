@@ -1,3 +1,5 @@
+// https://canvas.nus.edu.sg/courses/45621/files/folder/Reflection%20Sheets?preview=2486040
+
 function insert_cmp(x, xs, cmp) {
     return is_null(xs) 
            ? list(x)
@@ -14,7 +16,7 @@ function insertion_sort_cmp(xs, cmp) {
                         cmp);
 }
 
-// Test
+// Q1
 const xs = list(6, 3, 8, 5, 1, 9, 6, 4, 2, 7);
 
 // (a)
@@ -36,3 +38,10 @@ insertion_sort_cmp(xs, (x, y) => x % 2 === 0
                                     ? false
                                     : x > y);
 // Result: list(2, 4, 6, 6, 8, 9, 7, 5, 3, 1)
+
+
+// Q2
+
+// (a) theta(n)
+// (b) theta(nlog(n))
+
