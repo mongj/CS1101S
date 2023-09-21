@@ -1,5 +1,8 @@
 // https://canvas.nus.edu.sg/courses/45621/files/folder/Reflection%20Sheets?preview=2486040
 
+
+// By altering the cmp function, you can order a list in every possible way
+
 function insert_cmp(x, xs, cmp) {
     return is_null(xs) 
            ? list(x)
