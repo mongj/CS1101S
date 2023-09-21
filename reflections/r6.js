@@ -43,5 +43,5 @@ insertion_sort_cmp(xs, (x, y) => x % 2 === 0
 // Q2
 
 // (a) theta(n)
-// (b) theta(nlog(n))
+// (b) theta(nlog(n))   -- 2log(n)(2n + 1)
 
