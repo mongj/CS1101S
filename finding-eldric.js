@@ -8,7 +8,7 @@
 
 // init
 const SPEED = 150;
-const STOP_ACTION = "brake";
+const STOP_ACTION = "coast";
 const TARGET_LI = 15;
 const LI_LOWER_BOUND = 8;
 const LI_UPPER_BOUND = 34;
@@ -48,14 +48,14 @@ function motorsStop() {
 // stop and turn left on the spot
 function adjust_left() {
     ev3_motorSetSpeed(LEFT_MOTOR, -100);
-    ev3_motorSetSpeed(RIGHT_MOTOR, 0);
+    ev3_motorSetSpeed(RIGHT_MOTOR, 20);
     motorsStart();
 }
 
 // stop and turn right on the spot
 function adjust_right() {
-    ev3_motorSetSpeed(LEFT_MOTOR, -15);
-    ev3_motorSetSpeed(RIGHT_MOTOR, -100);
+    ev3_motorSetSpeed(LEFT_MOTOR, -25);
+    ev3_motorSetSpeed(RIGHT_MOTOR, -200);
     motorsStart();
 }
 
