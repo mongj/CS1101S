@@ -3,32 +3,34 @@
 // 2. Lee Ze Hao
 // 3. Sean Foong Jer Tsuen
 // 4. Zhang Ming Jun
-// 5. Zhang Yifan Jem
+// 5. Zhang Y"ifan Jem
 // 6. Ng Ze Rui
 
 // init
-const SPEED = 150;
+const SPEED = 200;
+let speed = 200;
 const STOP_ACTION = "coast";
-const TARGET_LI = 15;
-const LI_LOWER_BOUND = 8;
-const LI_UPPER_BOUND = 34;
+const TARGET_LI = 30;
+const LI_LOWER_BOUND = 15;
+const LI_UPPER_BOUND = 70;
 
-// needs tuning
-const KP = 1.1;
-const KI = 1;
-const KD = 1;
+const ADJ_L_MOTOR_L_SPEED = -300;
+const ADJ_L_MOTOR_R_SPEED = 300;
+const ADJ_R_MOTOR_L_SPEED = 200;
+const ADJ_R_MOTOR_R_SPEED = -200;
+
+// PID scaling factors
+const KP = 1;
+const KI = 0.1;
+const KD = 0.6;
 
 // list of motors
-const LEFT_MOTOR = ev3_motorB();
-const RIGHT_MOTOR = ev3_motorC();
+const LEFT_MOTOR = ev3_motorC();
+const RIGHT_MOTOR = ev3_motorB();
 const MOTORS = list(LEFT_MOTOR, RIGHT_MOTOR);
 
 // initialize motor speed and stop action
 function init(speed, stopAction) {
-    display("initialising robot...");
-    display(speed, "Speed:");
-    display(stopAction, "Stop Action:");
-    display("------------------------");
     ev3_motorSetSpeed(LEFT_MOTOR, speed);
     ev3_motorSetSpeed(RIGHT_MOTOR, speed);
     ev3_motorSetStopAction(LEFT_MOTOR, stopAction);
@@ -46,23 +48,27 @@ function motorsStop() {
 }
 
 // stop and turn left on the spot
-function adjust_left() {
-    ev3_motorSetSpeed(LEFT_MOTOR, -100);
-    ev3_motorSetSpeed(RIGHT_MOTOR, 20);
+function adjust_left(control) {
+    display('adjust left');
+    ev3_motorSetSpeed(LEFT_MOTOR, ADJ_L_MOTOR_L_SPEED + control);
+    ev3_motorSetSpeed(RIGHT_MOTOR, ADJ_L_MOTOR_R_SPEED - control);
     motorsStart();
 }
 
 // stop and turn right on the spot
-function adjust_right() {
-    ev3_motorSetSpeed(LEFT_MOTOR, -25);
-    ev3_motorSetSpeed(RIGHT_MOTOR, -200);
+function adjust_right(control) {
+    display('adjust right');
+    ev3_motorSetSpeed(LEFT_MOTOR, ADJ_R_MOTOR_L_SPEED - control);
+    ev3_motorSetSpeed(RIGHT_MOTOR, ADJ_R_MOTOR_R_SPEED + control);
     motorsStart();
 }
 
 // continue moving and adjust accordingly
 function adjust(control) {
-    ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
-    ev3_motorSetSpeed(RIGHT_MOTOR, SPEED - control);
+    display('adjust');
+    speed = speed * 1.01;
+    ev3_motorSetSpeed(LEFT_MOTOR, speed + control);
+    ev3_motorSetSpeed(RIGHT_MOTOR, speed - control);
     motorsStart();
 }
 
@@ -84,25 +90,34 @@ function main() {
     while (true) {
         const li = measure_li();
         const err = TARGET_LI - li;
+        display(li, "li:");
         
         proportional = err;
         integral = integral + err;
         derivative = err - last_err;
         
-        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
-        display(li, "li:");
-        display(control, "PID:");
-        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
-        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
-        display("-------------");
+        display(proportional, "proportional:");
+        display(integral, "integral:");
+        display(derivative, "derivative:");
         
+        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
+        display(control, "PID:");
+        display(ev3_motorGetSpeed(LEFT_MOTOR), "Left:");
+        display(ev3_motorGetSpeed(RIGHT_MOTOR), "Right:");
+        display("----------------");
         // adjust direction to trace the right side of the path
         if (li < TARGET_LI && li < LI_LOWER_BOUND) {
+            // motorsStop();
+            // break;
+            speed = SPEED;
             integral = 0;
-            adjust_right();
+            adjust_right(control);
         } else if (li >= TARGET_LI && li >= LI_UPPER_BOUND) {
+            // motorsStop();
+            // break;
+            speed = SPEED;
             integral = 0;
-            adjust_left();
+            adjust_left(control);
         } else {
             adjust(control);
         }
@@ -110,7 +125,6 @@ function main() {
         last_err = err;
         
         if (ev3_touchSensorPressed(ev3_touchSensor3())) {
-            display("terminating robot...");
             motorsStop();
             break;
         }
