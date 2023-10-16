@@ -54,7 +54,7 @@ function adjust_left() {
 
 // stop and turn right on the spot
 function adjust_right() {
-    ev3_motorSetSpeed(LEFT_MOTOR, -5);
+    ev3_motorSetSpeed(LEFT_MOTOR, -15);
     ev3_motorSetSpeed(RIGHT_MOTOR, -100);
     motorsStart();
 }
