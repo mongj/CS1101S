@@ -43,13 +43,13 @@ function motorsStop() {
     for_each(ev3_motorStop, MOTORS);
 }
 
-function adjust_left() {
+function adjust_left(control) {
     ev3_motorSetSpeed(LEFT_MOTOR, SPEED);
     ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + TURN_COEFF);
     motorsStart();
 }
 
-function adjust_right() {
+function adjust_right(control) {
     ev3_motorSetSpeed(LEFT_MOTOR, SPEED + TURN_COEFF);
     ev3_motorSetSpeed(RIGHT_MOTOR, SPEED);
     motorsStart();
@@ -72,18 +72,21 @@ function main() {
 
     while (true) {
         const li = measure_li();
-        const err = LI_THRESHOLD - li;
+        const err = TARGET_LI - li;
         
-        let proportional = TARGET_LI - li;
-        let integral = integral + err;
-        let derivative = err - last_err;
+        proportional = TARGET_LI - li;
+        integral = integral + err;
+        derivative = err - last_err;
         
-        if (li < LI_THRESHOLD) {
+        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
+        
+        // adjust direction to trace the right side of the path
+        if (li < TARGET_LI) {
             // too dark
-            adjust_right();
+            adjust_right(control);
         } else {
             // too bright
-            adjust_left();
+            adjust_left(control);
         }
         
         last_err = err;
