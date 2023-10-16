@@ -9,10 +9,12 @@
 // init
 const SPEED = 100;
 const STOP_ACTION = "brake";
-const TARGET_LI = 25;
+const TARGET_LI = 15;
+const LI_LOWER_BOUND = 8;
+const LI_UPPER_BOUND = 34;
 
 // needs tuning
-const KP = 1;
+const KP = 1.1;
 const KI = 1;
 const KD = 1;
 
@@ -43,33 +45,24 @@ function motorsStop() {
     for_each(ev3_motorStop, MOTORS);
 }
 
-function adjust_left(control) {
-    if (control > 500) {
-        ev3_motorSetSpeed(LEFT_MOTOR, -SPEED - control);
-        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + control);
-    } else {
-        ev3_motorSetSpeed(LEFT_MOTOR, SPEED - control);
-        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + control);
-        display("adjust left");
-        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
-        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
-        display("-------------");
-    }
+// stop and turn left on the spot
+function adjust_left() {
+    ev3_motorSetSpeed(LEFT_MOTOR, -200);
+    ev3_motorSetSpeed(RIGHT_MOTOR, 0);
     motorsStart();
 }
 
-function adjust_right(control) {
-    if (control > 500) {
-        ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
-        ev3_motorSetSpeed(RIGHT_MOTOR, -SPEED - control);
-    } else {
-        ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
-        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED - control);
-        display("adjust right");
-        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
-        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
-        display("-------------");
-    }
+// stop and turn right on the spot
+function adjust_right() {
+    ev3_motorSetSpeed(LEFT_MOTOR, 0);
+    ev3_motorSetSpeed(RIGHT_MOTOR, -200);
+    motorsStart();
+}
+
+// continue moving and adjust accordingly
+function adjust(control) {
+    ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
+    ev3_motorSetSpeed(RIGHT_MOTOR, SPEED - control);
     motorsStart();
 }
 
@@ -96,16 +89,23 @@ function main() {
         integral = integral + err;
         derivative = err - last_err;
         
-        const control = math_min(300, (proportional * KP) + (integral * KI) + (derivative * KD));
-        // display(control, "PID:");
+        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
+        display(li, "li:");
+        display(control, "PID:");
+        // display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
+        // display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
+        // display("-------------");
+        display("---------");
         
         // adjust direction to trace the right side of the path
-        if (li < TARGET_LI) {
-            // too dark
-            adjust_right(control);
+        if (li < TARGET_LI && li < LI_LOWER_BOUND) {
+            integral = 0;
+            adjust_right();
+        } else if (li >= TARGET_LI && li >= LI_UPPER_BOUND) {
+            integral = 0;
+            adjust_left();
         } else {
-            // too bright
-            adjust_left(control);
+            adjust(control);
         }
         
         last_err = err;
