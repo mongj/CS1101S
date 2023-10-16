@@ -47,15 +47,15 @@ function motorsStop() {
 
 // stop and turn left on the spot
 function adjust_left() {
-    ev3_motorSetSpeed(LEFT_MOTOR, -200);
+    ev3_motorSetSpeed(LEFT_MOTOR, -100);
     ev3_motorSetSpeed(RIGHT_MOTOR, 0);
     motorsStart();
 }
 
 // stop and turn right on the spot
 function adjust_right() {
-    ev3_motorSetSpeed(LEFT_MOTOR, 0);
-    ev3_motorSetSpeed(RIGHT_MOTOR, -200);
+    ev3_motorSetSpeed(LEFT_MOTOR, -5);
+    ev3_motorSetSpeed(RIGHT_MOTOR, -100);
     motorsStart();
 }
 
@@ -92,10 +92,9 @@ function main() {
         const control = (proportional * KP) + (integral * KI) + (derivative * KD);
         display(li, "li:");
         display(control, "PID:");
-        // display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
-        // display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
-        // display("-------------");
-        display("---------");
+        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
+        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
+        display("-------------");
         
         // adjust direction to trace the right side of the path
         if (li < TARGET_LI && li < LI_LOWER_BOUND) {
