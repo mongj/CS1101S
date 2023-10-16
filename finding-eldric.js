@@ -9,8 +9,12 @@
 // init
 const SPEED = 100;
 const STOP_ACTION = "brake";
-const TURN_COEFF = 100;
-const LI_THRESHOLD = 15;
+const TARGET_LI = 25;
+
+// needs tuning
+const KP = 1;
+const KI = 1;
+const KD = 1;
 
 // list of motors
 const LEFT_MOTOR = ev3_motorB();
@@ -60,9 +64,19 @@ function main() {
     init(SPEED, STOP_ACTION);
     
     motorsStart();
+    
+    let last_err = 0;
+    let proportional = 0;
+    let integral = 0;
+    let derivative = 0;
 
     while (true) {
         const li = measure_li();
+        const err = LI_THRESHOLD - li;
+        
+        let proportional = TARGET_LI - li;
+        let integral = integral + err;
+        let derivative = err - last_err;
         
         if (li < LI_THRESHOLD) {
             // too dark
@@ -71,6 +85,8 @@ function main() {
             // too bright
             adjust_left();
         }
+        
+        last_err = err;
         
         if (ev3_touchSensorPressed(ev3_touchSensor3())) {
             display("terminating robot...");
