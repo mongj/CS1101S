@@ -7,7 +7,7 @@
 // 6. Ng Ze Rui
 
 // init
-const SPEED = 100;
+const SPEED = 150;
 const STOP_ACTION = "brake";
 const TARGET_LI = 15;
 const LI_LOWER_BOUND = 8;
