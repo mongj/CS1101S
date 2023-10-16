@@ -44,14 +44,32 @@ function motorsStop() {
 }
 
 function adjust_left(control) {
-    ev3_motorSetSpeed(LEFT_MOTOR, SPEED);
-    ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + TURN_COEFF);
+    if (control > 500) {
+        ev3_motorSetSpeed(LEFT_MOTOR, -SPEED - control);
+        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + control);
+    } else {
+        ev3_motorSetSpeed(LEFT_MOTOR, SPEED - control);
+        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED + control);
+        display("adjust left");
+        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
+        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
+        display("-------------");
+    }
     motorsStart();
 }
 
 function adjust_right(control) {
-    ev3_motorSetSpeed(LEFT_MOTOR, SPEED + TURN_COEFF);
-    ev3_motorSetSpeed(RIGHT_MOTOR, SPEED);
+    if (control > 500) {
+        ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
+        ev3_motorSetSpeed(RIGHT_MOTOR, -SPEED - control);
+    } else {
+        ev3_motorSetSpeed(LEFT_MOTOR, SPEED + control);
+        ev3_motorSetSpeed(RIGHT_MOTOR, SPEED - control);
+        display("adjust right");
+        display(ev3_motorGetSpeed(LEFT_MOTOR),"Left:");
+        display(ev3_motorGetSpeed(RIGHT_MOTOR),"Right:");
+        display("-------------");
+    }
     motorsStart();
 }
 
@@ -74,11 +92,12 @@ function main() {
         const li = measure_li();
         const err = TARGET_LI - li;
         
-        proportional = TARGET_LI - li;
+        proportional = err;
         integral = integral + err;
         derivative = err - last_err;
         
-        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
+        const control = math_min(300, (proportional * KP) + (integral * KI) + (derivative * KD));
+        // display(control, "PID:");
         
         // adjust direction to trace the right side of the path
         if (li < TARGET_LI) {
