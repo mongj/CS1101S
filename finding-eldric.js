@@ -3,12 +3,11 @@
 // 2. Lee Ze Hao
 // 3. Sean Foong Jer Tsuen
 // 4. Zhang Ming Jun
-// 5. Zhang Y"ifan Jem
+// 5. Zhang Yifan Jem
 // 6. Ng Ze Rui
 
 // init
-const SPEED = 200;
-let speed = 200;
+const BASE_SPEED = 200;
 const STOP_ACTION = "coast";
 const TARGET_LI = 30;
 const LI_LOWER_BOUND = 15;
@@ -18,6 +17,8 @@ const ADJ_L_MOTOR_L_SPEED = -300;
 const ADJ_L_MOTOR_R_SPEED = 300;
 const ADJ_R_MOTOR_L_SPEED = 200;
 const ADJ_R_MOTOR_R_SPEED = -200;
+
+let speed = 200;
 
 // PID scaling factors
 const KP = 1;
@@ -66,7 +67,11 @@ function adjust_right(control) {
 // continue moving and adjust accordingly
 function adjust(control) {
     display('adjust');
+    
+    // accelerate on straight line
     speed = speed * 1.01;
+    
+    // adjust directions
     ev3_motorSetSpeed(LEFT_MOTOR, speed + control);
     ev3_motorSetSpeed(RIGHT_MOTOR, speed - control);
     motorsStart();
@@ -78,7 +83,7 @@ function measure_li() {
 }
 
 function main() {
-    init(SPEED, STOP_ACTION);
+    init(BASE_SPEED, STOP_ACTION);
     
     motorsStart();
     
@@ -90,31 +95,30 @@ function main() {
     while (true) {
         const li = measure_li();
         const err = TARGET_LI - li;
-        display(li, "li:");
         
         proportional = err;
         integral = integral + err;
         derivative = err - last_err;
         
-        display(proportional, "proportional:");
-        display(integral, "integral:");
-        display(derivative, "derivative:");
+        const control = (proportional * KP) + 
+                        (integral * KI) + 
+                        (derivative * KD);
         
-        const control = (proportional * KP) + (integral * KI) + (derivative * KD);
+        display("----------------");
+        display(li, "li:");
+        display(proportional, "p:");
+        display(integral, "i:");
+        display(derivative, "d:");
         display(control, "PID:");
         display(ev3_motorGetSpeed(LEFT_MOTOR), "Left:");
         display(ev3_motorGetSpeed(RIGHT_MOTOR), "Right:");
-        display("----------------");
+        
         // adjust direction to trace the right side of the path
         if (li < TARGET_LI && li < LI_LOWER_BOUND) {
-            // motorsStop();
-            // break;
             speed = SPEED;
             integral = 0;
             adjust_right(control);
         } else if (li >= TARGET_LI && li >= LI_UPPER_BOUND) {
-            // motorsStop();
-            // break;
             speed = SPEED;
             integral = 0;
             adjust_left(control);
@@ -124,6 +128,7 @@ function main() {
         
         last_err = err;
         
+        // break loop
         if (ev3_touchSensorPressed(ev3_touchSensor3())) {
             motorsStop();
             break;
