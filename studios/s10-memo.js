@@ -37,20 +37,21 @@ function cc(amount, kinds_of_coins) {
 // n is the amount in cents, and k is the number of denominations.
 let count = 0;
 function mcc(n, k) {
-    // count = count + 1;
     if (n === 0) {
         return 1;
     } else if (n < 0 || k === 0) {
         return 0;
     } else {
-        count = count + 1;
+        
         if (read(n, k) === undefined) {
-        write(n, k,
-              mcc(n, k - 1) + 
-              mcc(n - first_denomination(k),k));
+            count = count + 1;
+            display("n = " + stringify(n) + ", k = " + stringify(k));
+            write(n, k,
+                  mcc(n, k - 1) + 
+                  mcc(n - first_denomination(k),k));
         }
         return read(n, k);
     }
 }
+display(mcc(365, 5));  // Expected result: 1730
 display(count);
-mcc(50, 5);  // Expected result: 1730
