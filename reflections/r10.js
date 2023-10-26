@@ -46,6 +46,13 @@ function zip_streams(s1, s2) {
 }
 
 function zip_list_of_streams(xs) {
+    return pair(head(head(xs)),
+                () => zip_list_of_streams(
+                    append(tail(xs), 
+                           list(stream_tail(head(xs))))));
+}
+
+function zip_list_of_streams_alt(xs) {
     return is_null(xs) ? xs
          : accumulate((h, acc) => () => pair(head(h), acc),
                       () => zip_list_of_streams(map(x => stream_tail(x), xs)),
@@ -53,13 +60,19 @@ function zip_list_of_streams(xs) {
 }
 
 function partial_sums(s) {
+    return is_null(s) ? s
+         : pair(head(s),
+                () => add_streams(stream_tail(s), partial_sums(s)));
+}
+
+function partial_sums_alt(s) {
     const loop = pair(head(s), () => loop);
     return is_null(s) ? s
          : pair(head(s),
                 () => add_streams(loop, partial_sums(stream_tail(s))));
 }
 
-function partial_sums_alt(s) {
+function partial_sums_alt2(s) {
     return is_null(s) ? s
          : pair(head(s),
                 () => stream_map(x => x + head(s),
