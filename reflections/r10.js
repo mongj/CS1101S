@@ -47,9 +47,8 @@ function zip_streams(s1, s2) {
 
 function zip_list_of_streams(xs) {
     return pair(head(head(xs)),
-                () => zip_list_of_streams(
-                    append(tail(xs), 
-                           list(stream_tail(head(xs))))));
+                () => zip_list_of_streams(append(tail(xs), 
+                                          list(stream_tail(head(xs))))));
 }
 
 function zip_list_of_streams_alt(xs) {
