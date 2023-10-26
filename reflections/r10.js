@@ -42,8 +42,7 @@ function zip_streams(s1, s2) {
     return is_null(s1) ? s2
          : is_null(s2) ? s1
          : pair(head(s1),
-                () => pair(head(s2),
-                          () => zip_streams(stream_tail(s1), stream_tail(s2))));
+                () => zip_streams(s2, stream_tail(s1))));
 }
 
 function zip_list_of_streams(xs) {
