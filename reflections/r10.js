@@ -42,7 +42,7 @@ function zip_streams(s1, s2) {
     return is_null(s1) ? s2
          : is_null(s2) ? s1
          : pair(head(s1),
-                () => zip_streams(s2, stream_tail(s1))));
+                () => zip_streams(s2, stream_tail(s1)));
 }
 
 function zip_list_of_streams(xs) {
@@ -70,6 +70,6 @@ const integers = integers_from(1);
 const ones = pair(1, () => ones);
 const xs = list(integers_from(10),integers_from(100),integers_from(1000));
 
-//eval_stream(zip_list_of_streams(xs), 9);
+eval_stream(zip_list_of_streams(xs), 9);
 
 eval_stream(partial_sums(integers),10);
