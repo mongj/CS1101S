@@ -68,14 +68,14 @@ function partial_sums_alt(s) {
     const loop = pair(head(s), () => loop);
     return is_null(s) ? s
          : pair(head(s),
-                () => add_streams(loop, partial_sums(stream_tail(s))));
+                () => add_streams(loop, partial_sums_alt(stream_tail(s))));
 }
 
 function partial_sums_alt2(s) {
     return is_null(s) ? s
          : pair(head(s),
                 () => stream_map(x => x + head(s),
-                                 partial_sums(stream_tail(s))));
+                                 partial_sums_alt2(stream_tail(s))));
 }
 
 const integers = integers_from(1);
